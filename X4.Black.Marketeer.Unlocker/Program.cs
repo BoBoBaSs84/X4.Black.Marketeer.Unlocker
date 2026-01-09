@@ -40,15 +40,35 @@ internal sealed class Program
 		string saveFilePath = args[0];
 		string backupPath = args[0] + ".bak";
 
-		if (!File.Exists(backupPath))
+		if (!File.Exists(saveFilePath))
 		{
-			Console.WriteLine("Creating backup of the save file...");
-			File.Copy(saveFilePath, backupPath);
+			Console.WriteLine($"Error: Save file '{saveFilePath}' does not exist.");
+			return;
 		}
+
+		Console.WriteLine("Creating backup of the save file...");
+		File.Copy(saveFilePath, backupPath, true);
 
 		XElement savegame = await LoadSaveGameFile(saveFilePath, ct)
 			.ConfigureAwait(false);
 
+		UnlockAllBlackMarketeers(savegame);
+
+		await SaveSaveGameFile(savegame, saveFilePath, ct)
+			.ConfigureAwait(false);
+	}
+
+	/// <summary>
+	/// Unlocks all black marketeer components in the specified savegame by making their trades visible.
+	/// </summary>
+	/// <remarks>
+	/// This method updates the 'flags' attribute of each black marketeer's 'traits' element to include
+	/// 'tradesvisible', if not already present. Only components with a 'stockid' attribute value of
+	/// 'default_shadyguy' are affected.
+	/// </remarks>
+	/// <param name="savegame">The XML element representing the savegame data to modify.</param>
+	private static void UnlockAllBlackMarketeers(XElement savegame)
+	{
 		IEnumerable<XElement> marketeers = savegame.Descendants("component")
 			.Where(x => x.Attribute("stockid")?.Value == "default_shadyguy");
 
@@ -74,9 +94,6 @@ internal sealed class Program
 			marketeer.Element("traits")?.SetAttributeValue("flags", flags + "|tradesvisible");
 			Console.WriteLine($"Marketeer '{name}' ({code}) of faction '{faction}' has been unlocked.");
 		}
-
-		await SaveSaveGameFile(savegame, saveFilePath, ct)
-			.ConfigureAwait(false);
 	}
 
 	/// <summary>
