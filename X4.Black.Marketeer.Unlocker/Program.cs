@@ -74,6 +74,18 @@ internal sealed class Program
 
 		foreach (XElement marketeer in marketeers)
 		{
+			XElement? sectorElement = marketeer.Ancestors("component")
+				.FirstOrDefault(x => x.Attribute("class")?.Value == "sector");
+
+			string sectorCode = sectorElement?.Attribute("code")?.Value ?? "unknown";
+			string sectorFaction = sectorElement?.Attribute("owner")?.Value ?? "unknown";
+
+			XElement? stationElement = marketeer.Ancestors("component")
+				.FirstOrDefault(x => x.Attribute("class")?.Value == "station");
+
+			string stationCode = stationElement?.Attribute("code")?.Value ?? "unknown";
+			string stationFaction = stationElement?.Attribute("owner")?.Value ?? "unknown";
+
 			string faction = marketeer.Attribute("owner")?.Value ?? "unknown";
 			string name = marketeer.Attribute("name")?.Value ?? "unknown";
 			string code = marketeer.Attribute("code")?.Value ?? "unknown";
@@ -85,12 +97,17 @@ internal sealed class Program
 
 			if (flags.Contains("tradesvisible"))
 			{
-				Console.WriteLine($"Marketeer '{name}' ({code}) of faction '{faction}' is already unlocked.");
+				Console.WriteLine($"Marketeer '{code}' - '{name}' (faction: '{faction}')" +
+					$" in sector '{sectorCode}' (faction: '{sectorFaction}')" +
+					$" on station '{stationCode}' (faction: '{stationFaction}') is already unlocked.");
 				continue;
 			}
 
 			marketeer.Element("traits")?.SetAttributeValue("flags", flags + "|tradesvisible");
-			Console.WriteLine($"Marketeer '{name}' ({code}) of faction '{faction}' has been unlocked.");
+			
+			Console.WriteLine($"Marketeer '{code}' - '{name}' (faction: '{faction}')" +
+				$" in sector '{sectorCode}' (faction: '{sectorFaction}')" +
+				$" on station '{stationCode}' (faction: '{stationFaction}') has been unlocked.");
 		}
 	}
 
