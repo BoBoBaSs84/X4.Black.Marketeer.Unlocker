@@ -48,7 +48,7 @@ X4.Black.Marketeer.Unlocker.exe <path-to-save-file.xml.gz>
 Example:
 
 ```cmd
-X4.Black.Marketeer.Unlocker.exe "C:\Users\<YourName>\Documents\Egosoft\X4\save\save_001.xml.gz"
+X4.Black.Marketeer.Unlocker.exe "C:\Users\<YourAccount>\Documents\Egosoft\<YourSteamId>\X4\save\save_001.xml.gz"
 ```
 
 ### What Happens
