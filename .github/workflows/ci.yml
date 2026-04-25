@@ -1,4 +1,4 @@
-name: CI
+name: Continuous Integration
 
 permissions:
   contents: read
@@ -10,23 +10,23 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  build-and-test:
+    name: Build & Test
     runs-on: ubuntu-latest
 
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: '8.0.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
 
-    - name: Restore
-      run: dotnet restore
-    
-    - name: Build
-      run: dotnet build --no-restore --configuration release --verbosity minimal
+      - name: Restore dependencies
+        run: dotnet restore X4.Black.Marketeer.Unlocker.slnx
 
+      - name: Build solution
+        run: dotnet build X4.Black.Marketeer.Unlocker.slnx --configuration Release --no-restore
